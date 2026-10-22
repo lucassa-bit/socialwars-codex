@@ -243,9 +243,10 @@ function resultUnits() {
 function fillResults() {
   parkCards();
   const hits = resultUnits();
-  hits.forEach((unit) => {
+  hits.forEach((unit, index) => {
     const card = cardsById.get(unit.id);
     card.classList.remove("hidden");
+    card.classList.toggle("closest", sortKey === "alvo" && index === 0);
     resultsEl.appendChild(card);
   });
   resultsToolbar.hidden = hits.length === 0;
@@ -256,7 +257,11 @@ function fillResults() {
 
 function fillPicker() {
   parkCards();
-  fuseUnits.forEach((unit) => pickerGrid.appendChild(cardsById.get(unit.id)));
+  fuseUnits.forEach((unit) => {
+    const card = cardsById.get(unit.id);
+    card.classList.remove("closest");
+    pickerGrid.appendChild(card);
+  });
   applyPickerFilter();
 }
 
@@ -327,6 +332,10 @@ function buildCatalog() {
     } else {
       thumb.innerHTML = '<div class="no-img">sem imagem</div>';
     }
+    const orderBadge = document.createElement("span");
+    orderBadge.className = "order-badge";
+    orderBadge.textContent = String(fusionOrder(unit));
+    thumb.appendChild(orderBadge);
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML = `
@@ -381,34 +390,32 @@ function parentThumb(unit) {
 }
 
 function renderSlot(slotEl, unit, role) {
-  const title = role === "a" ? "Pai A" : "Pai B";
+  const title = role === "a" ? "Escolher pai A" : "Escolher pai B";
   slotEl.replaceChildren();
-  const label = document.createElement("label");
-  label.textContent = title;
-  slotEl.appendChild(label);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.pick = role;
+  const thumb = document.createElement("div");
+  thumb.className = "parent-thumb";
   if (!unit) {
-    const button = document.createElement("button");
-    button.type = "button";
     button.className = "parent-pick";
-    button.dataset.pick = role;
-    button.textContent = "Escolher tropa";
+    thumb.textContent = "+";
+    const label = document.createElement("span");
+    label.textContent = title;
+    button.append(thumb, label);
     slotEl.appendChild(button);
     return;
   }
-  const card = document.createElement("div");
-  card.className = "parent-card";
+  button.className = "parent-card";
   const src = unit.thumb || unit.image;
-  if (src) card.appendChild(parentThumb(unit));
+  if (src) thumb.appendChild(parentThumb(unit));
+  else thumb.textContent = "sem imagem";
   const info = document.createElement("div");
   info.innerHTML = `
     <strong>${escapeHtml(unit.name)}</strong>
-    <span>ID ${unit.id} · order ${fusionOrder(unit)} · vida ${unit.life}</span>`;
-  const change = document.createElement("button");
-  change.type = "button";
-  change.dataset.pick = role;
-  change.textContent = "Trocar";
-  card.append(info, change);
-  slotEl.appendChild(card);
+    <span>order ${fusionOrder(unit)} · vida ${unit.life}</span>`;
+  button.append(thumb, info);
+  slotEl.appendChild(button);
 }
 
 function setParent(role, unit) {

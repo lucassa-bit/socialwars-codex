@@ -7,6 +7,16 @@
   --line: #3a4a2e;
 }
 
+body[data-game="empires"],
+.hub-card[data-game="empires"] {
+  --bg: #1c1a14;
+  --panel: #2c281c;
+  --ink: #efe8d8;
+  --muted: #b5a882;
+  --accent: #c4a35a;
+  --line: #4a4230;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -17,7 +27,7 @@ body {
 }
 
 header {
-  padding: 20px 24px 12px;
+  padding: 12px 24px 10px;
   border-bottom: 1px solid var(--line);
   background: var(--panel);
   position: sticky;
@@ -48,31 +58,76 @@ h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
   font-size: 13px;
 }
 
-.crumb { margin: 0 0 8px; font-size: 12px; }
-.crumb a { color: var(--muted); text-decoration: none; }
-.crumb a:hover { color: var(--accent); }
-
-.game-nav {
+.site-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 0 0 8px;
+}
+
+.site-bar .back { margin-right: auto; }
+
+.site-bar .game-nav { margin: 0; }
+
+.back {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.back:hover { text-decoration: underline; }
+
+.game-switch {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.game-switch a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.game-switch a:hover { color: var(--ink); }
+
+.game-switch a[aria-current="page"] {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.game-nav {
+  display: inline-flex;
   margin: 0 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
 }
 
 .game-nav a {
   color: var(--muted);
   text-decoration: none;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  border-radius: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 13px;
+  font-weight: 650;
+  background: transparent;
 }
 
-.game-nav a:hover,
+.game-nav a + a { border-left: 1px solid var(--line); }
+
+.game-nav a:hover { color: var(--ink); }
+
 .game-nav a[aria-current="page"] {
-  color: var(--ink);
-  border-color: var(--accent);
+  color: #14210c;
+  background: var(--accent);
 }
 
 .toolbar {
@@ -157,14 +212,27 @@ h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 20px;
+  overflow: hidden;
   color: inherit;
   text-decoration: none;
 }
 
 .hub-card:hover { border-color: var(--accent); }
-.hub-card h2 { margin: 0 0 8px; font-size: 20px; }
-.hub-card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.hub-cover {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #151a10;
+}
+
+.hub-cover img { max-width: 100%; max-height: 180px; object-fit: contain; }
+
+.hub-body { padding: 16px 20px 18px; }
+.hub-card h2 { margin: 0 0 6px; font-size: 20px; }
+.hub-card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.hub-go { color: var(--accent); font-size: 13px; font-weight: 650; }
 
 #grid {
   display: grid;
@@ -185,11 +253,24 @@ h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
 .card.active { border-color: var(--accent); }
 
 .thumb {
+  position: relative;
   height: 210px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #151a10;
+}
+
+.order-badge {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  background: rgba(20, 33, 12, 0.88);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 650;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .thumb img { max-width: 100%; max-height: 210px; object-fit: contain; }
@@ -394,6 +475,14 @@ body.fusion-page main {
   max-width: 72ch;
 }
 
+.fusion-note summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.fusion-note p { margin: 8px 0 0; }
+
 .fusion-note code {
   color: var(--ink);
   font-size: 12px;
@@ -421,32 +510,52 @@ body.fusion-page main {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px;
   position: relative;
 }
 
-.parent-slot label {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.parent-pick {
+.parent-pick,
+.parent-card {
   width: 100%;
-  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   background: var(--bg);
   color: var(--ink);
   border: 1px dashed var(--line);
   border-radius: 8px;
-  padding: 16px 12px;
+  padding: 12px;
   cursor: pointer;
-  font-size: 14px;
+  font: inherit;
+  text-align: center;
 }
 
-.parent-pick:hover { border-color: var(--accent); }
+.parent-card { border-style: solid; }
+
+.parent-pick:hover,
+.parent-card:hover { border-color: var(--accent); }
+
+.parent-thumb {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #151a10;
+  border-radius: 6px;
+}
+
+.parent-thumb img {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.parent-pick .parent-thumb { border: 1px dashed var(--line); color: var(--muted); font-size: 12px; }
+
+.parent-card strong { display: block; font-size: 14px; }
+.parent-card span { color: var(--muted); font-size: 12px; }
 
 #picker {
   width: min(1100px, calc(100vw - 24px));
@@ -523,37 +632,29 @@ body.fusion-page main {
 }
 
 .fusion-results .card {
+  position: relative;
   flex: 1 1 170px;
   width: 170px;
   max-width: 100%;
   min-width: min(170px, 100%);
 }
 
-.parent-card {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+.card.closest { border-color: var(--accent); }
 
-.parent-card img {
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-  background: #151a10;
-  border-radius: 6px;
-}
-
-.parent-card strong { display: block; font-size: 14px; }
-.parent-card span { color: var(--muted); font-size: 12px; }
-
-.parent-card button {
-  margin-left: auto;
-  background: var(--bg);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 4px 10px;
-  cursor: pointer;
+.card.closest::after {
+  content: "mais perto";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  background: var(--accent);
+  color: #14210c;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .fusion-swap {
