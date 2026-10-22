@@ -16,6 +16,14 @@ Abre `http://127.0.0.1:8765/`. O JSON não carrega em `file://`.
 - `/wars.html` — tropas de Social Wars (`#/unit/1007` abre a ficha)
 - `/empires.html` — tropas de Social Empires
 
+## GitHub Pages
+
+Site estático na raiz. `.nojekyll` impede o Jekyll de mexer nos arquivos. O workflow `.github/workflows/pages.yml` publica `main`.
+
+PNG masters (`img/bodies`, `img/anim`, `img/empires/bodies`, `img/empires/anim`) ficam fora do git. O Pages serve só os WebP.
+
+Repo precisa ser **público** no plano grátis do GitHub.
+
 ## Imagens (Wars)
 
 O site publicado serve só `img/thumbs/` e `img/walk/` (WebP). Os PNG masters em `img/bodies/` e `img/anim/` (~680 MB) são locais, gitignored, e não vão para o ar.
