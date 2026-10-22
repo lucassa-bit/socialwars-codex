@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atom Fusion — Social Wars</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="fusion-page" data-game="wars">
+  <header>
+    <p class="crumb"><a href="index.html">Codex</a></p>
+    <h1>Atom Fusion</h1>
+    <nav class="game-nav">
+      <a href="wars.html">Tropas</a>
+      <a href="fusion.html" aria-current="page">Fusão</a>
+    </nav>
+    <p class="sub" id="subtitle">Escolhe duas tropas para ver a faixa de filhos.</p>
+    <p id="file-warn">Abra com <code>python scripts/serve.py</code> — o navegador bloqueia o JSON em <code>file://</code>.</p>
+  </header>
+  <main>
+    <p class="fusion-note">
+      Conta reversa do emulador: <code>order = min(vida/20, 240)</code>,
+      <code>alvo = (orderA + orderB) × 3/5</code>,
+      faixa entre o alvo e o pai mais forte.
+      O jogo sorteia um filho nessa faixa — não há receita fixa.
+    </p>
+    <div class="fusion-setup">
+      <div class="parent-slot" id="slot-a" data-slot="a"></div>
+      <button type="button" class="fusion-swap" id="swap" title="Trocar pais">⇄</button>
+      <div class="parent-slot" id="slot-b" data-slot="b"></div>
+    </div>
+    <div class="fusion-controls">
+      <div class="boost-row">
+        <span>Aprimorar (hipótese)</span>
+        <div class="chips" id="boost-chips"></div>
+      </div>
+      <p class="fusion-math" id="math">Escolhe os dois pais.</p>
+    </div>
+    <div class="range-track" id="range-track" hidden>
+      <i class="range-fill" id="range-fill"></i>
+      <i class="range-mark" id="mark-a"></i>
+      <i class="range-mark" id="mark-b"></i>
+      <span class="range-label" id="range-lo-label"></span>
+      <span class="range-label" id="range-hi-label"></span>
+    </div>
+    <div class="toolbar" id="results-toolbar" hidden>
+      <p id="fusion-count"></p>
+      <label class="sort-wrap">
+        Ordenar
+        <select id="sort">
+          <option value="alvo">Mais perto do alvo</option>
+          <option value="order-asc">Order crescente</option>
+          <option value="order-desc">Order decrescente</option>
+          <option value="life-desc">Vida</option>
+          <option value="attack-desc">Ataque</option>
+          <option value="name">Nome</option>
+          <option value="group">Grupo</option>
+          <option value="pop-desc">População</option>
+        </select>
+      </label>
+    </div>
+    <div class="fusion-results" id="results"></div>
+  </main>
+  <dialog id="picker">
+    <header>
+      <div>
+        <h2 id="picker-title">Escolher tropa</h2>
+        <p class="sub" id="picker-sub">Clique num card da lista.</p>
+      </div>
+      <button type="button" id="picker-close">Fechar</button>
+      <div class="toolbar">
+        <input id="picker-search" type="search" placeholder="Filtrar a lista…" autocomplete="off">
+        <button type="button" id="picker-filter-toggle" aria-expanded="false" aria-controls="picker-filters">Filtros</button>
+      </div>
+      <div id="picker-filters" hidden></div>
+    </header>
+    <div class="fusion-results" id="picker-grid"></div>
+  </dialog>
+  <div id="card-pool" hidden></div>
+  <div id="overlay">
+    <div id="viewer">
+      <header>
+        <div>
+          <h2 id="viewer-title"></h2>
+          <p id="viewer-id"></p>
+        </div>
+        <button type="button" id="close">Fechar</button>
+      </header>
+      <div id="viewer-body">
+        <div id="player"></div>
+        <div>
+          <div id="stats"></div>
+          <p class="fusion-note" id="viewer-link"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/fusion.js"></script>
+</body>
+</html>

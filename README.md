@@ -14,7 +14,9 @@ Abre `http://127.0.0.1:8765/`. O JSON não carrega em `file://`.
 
 - `/` — hub (escolhe o jogo)
 - `/wars.html` — tropas de Social Wars (`#/unit/1007` abre a ficha)
-- `/empires.html` — tropas de Social Empires
+- `/fusion.html` — Atom Fusion (`#/mix/1062/1075` dois pais)
+- `/empires.html` — tropas de Social Empires (`#/unit/516` abre a ficha)
+- `/empires-fusion.html` — Soul Mixer (`#/mix/516/2037` dois pais)
 
 ## GitHub Pages
 
