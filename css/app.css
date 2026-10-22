@@ -166,7 +166,7 @@ h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
 .hub-card h2 { margin: 0 0 8px; font-size: 20px; }
 .hub-card p { margin: 0; color: var(--muted); font-size: 14px; }
 
-main {
+#grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 12px;
