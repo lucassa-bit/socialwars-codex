@@ -1,0 +1,10 @@
+_vendor/
+# PNG masters only — thumbs/walk WebP are the published assets
+img/bodies/
+img/anim/
+img/empires/bodies/
+img/empires/anim/
+__pycache__/
+.idea/
+.vs/
+*.lnk
