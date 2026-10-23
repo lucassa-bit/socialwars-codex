@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Social Wars — Codex de tropas</title>
-  <link rel="stylesheet" href="css/app.css?v=4">
+  <link rel="stylesheet" href="css/app.css?v=6">
 </head>
 <body data-game="wars">
   <header>
@@ -24,6 +24,18 @@
     <div class="toolbar">
       <input id="search" type="search" placeholder="Buscar por nome ou ID…" autocomplete="off">
       <button type="button" id="filter-toggle" aria-expanded="false" aria-controls="filters">Filtros</button>
+      <label class="sort-wrap">
+        Ordenar
+        <select id="sort">
+          <option value="order-desc">Order decrescente</option>
+          <option value="order-asc">Order crescente</option>
+          <option value="life-desc">Vida</option>
+          <option value="attack-desc">Ataque</option>
+          <option value="name">Nome</option>
+          <option value="group">Grupo</option>
+          <option value="pop-desc">População</option>
+        </select>
+      </label>
     </div>
     <div id="filters" hidden></div>
   </header>
@@ -46,6 +58,6 @@
       </div>
     </div>
   </div>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/app.js?v=6"></script>
 </body>
 </html>

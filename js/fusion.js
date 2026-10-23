@@ -57,6 +57,7 @@ const pickerTitle = document.getElementById("picker-title");
 const pickerSub = document.getElementById("picker-sub");
 const cardPool = document.getElementById("card-pool");
 const sortEl = document.getElementById("sort");
+const pickerSortEl = document.getElementById("picker-sort");
 
 /** @type {object[]} */
 let fuseUnits = [];
@@ -78,6 +79,7 @@ const selectedTraits = new Set();
 const cardsById = new Map();
 const playerImg = document.createElement("img");
 let sortKey = "alvo";
+let pickerSortKey = "order-desc";
 
 if (location.protocol === "file:") {
   document.getElementById("file-warn").style.display = "block";
@@ -203,13 +205,13 @@ function applyPickerFilter() {
   pickerSub.textContent = `${visible} tropas — clique para escolher.`;
 }
 
-function compareUnits(left, right) {
+function compareUnits(left, right, key = sortKey) {
   const orderLeft = fusionOrder(left);
   const orderRight = fusionOrder(right);
   const range = currentRange();
   const alvo = range ? range.mix.alvo : 0;
   const name = left.name.localeCompare(right.name, "pt");
-  switch (sortKey) {
+  switch (key) {
     case "order-asc":
       return orderLeft - orderRight || name;
     case "order-desc":
@@ -257,11 +259,14 @@ function fillResults() {
 
 function fillPicker() {
   parkCards();
-  fuseUnits.forEach((unit) => {
-    const card = cardsById.get(unit.id);
-    card.classList.remove("closest");
-    pickerGrid.appendChild(card);
-  });
+  fuseUnits
+    .slice()
+    .sort((left, right) => compareUnits(left, right, pickerSortKey))
+    .forEach((unit) => {
+      const card = cardsById.get(unit.id);
+      card.classList.remove("closest");
+      pickerGrid.appendChild(card);
+    });
   applyPickerFilter();
 }
 
@@ -310,6 +315,28 @@ function renderPickerFilters() {
   });
 }
 
+function makeThumb(unit, hidden) {
+  const src = unit.thumb || unit.image;
+  const thumb = document.createElement("div");
+  thumb.className = hidden ? "thumb thumb-hidden" : "thumb";
+  if (src) {
+    const image = document.createElement("img");
+    image.alt = hidden ? `Sombra de ${unit.name}` : unit.name;
+    image.decoding = "async";
+    image.src = src;
+    thumb.appendChild(image);
+  } else {
+    thumb.innerHTML = '<div class="no-img">sem imagem</div>';
+  }
+  if (!hidden) {
+    const orderBadge = document.createElement("span");
+    orderBadge.className = "order-badge";
+    orderBadge.textContent = String(fusionOrder(unit));
+    thumb.appendChild(orderBadge);
+  }
+  return thumb;
+}
+
 function buildCatalog() {
   if (cardsById.size) return;
   const fragment = document.createDocumentFragment();
@@ -320,22 +347,9 @@ function buildCatalog() {
     card.dataset.name = unit.name.toLowerCase();
     card.dataset.group = unit.group || "";
     card.dataset.traits = (unit.traits || []).join(",");
-    const src = unit.thumb || unit.image;
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    if (src) {
-      const image = document.createElement("img");
-      image.alt = unit.name;
-      image.decoding = "async";
-      image.src = src;
-      thumb.appendChild(image);
-    } else {
-      thumb.innerHTML = '<div class="no-img">sem imagem</div>';
-    }
-    const orderBadge = document.createElement("span");
-    orderBadge.className = "order-badge";
-    orderBadge.textContent = String(fusionOrder(unit));
-    thumb.appendChild(orderBadge);
+    const thumbs = document.createElement("div");
+    thumbs.className = "thumbs";
+    thumbs.append(makeThumb(unit, false), makeThumb(unit, true));
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML = `
@@ -343,7 +357,7 @@ function buildCatalog() {
       <span class="order">order ${fusionOrder(unit)} · vida ${unit.life}</span>
       <span class="id">ID ${unit.id}</span>
       <span class="group">${escapeHtml(unit.group_label || "Outros")}</span>`;
-    card.append(thumb, meta);
+    card.append(thumbs, meta);
     card.addEventListener("click", () => onCatalogClick(unit));
     cardsById.set(unit.id, card);
     fragment.appendChild(card);
@@ -581,6 +595,10 @@ pickerFilterToggle.addEventListener("click", () => {
 sortEl.addEventListener("change", () => {
   sortKey = sortEl.value;
   if (!picker.open) fillResults();
+});
+pickerSortEl.addEventListener("change", () => {
+  pickerSortKey = pickerSortEl.value;
+  if (picker.open) fillPicker();
 });
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Atom Fusion — Social Wars</title>
-  <link rel="stylesheet" href="css/app.css?v=4">
+  <link rel="stylesheet" href="css/app.css?v=6">
 </head>
 <body class="fusion-page" data-game="wars">
   <header>
@@ -79,6 +79,18 @@
       <div class="toolbar">
         <input id="picker-search" type="search" placeholder="Filtrar a lista…" autocomplete="off">
         <button type="button" id="picker-filter-toggle" aria-expanded="false" aria-controls="picker-filters">Filtros</button>
+        <label class="sort-wrap">
+          Ordenar
+          <select id="picker-sort">
+            <option value="order-desc">Order decrescente</option>
+            <option value="order-asc">Order crescente</option>
+            <option value="life-desc">Vida</option>
+            <option value="attack-desc">Ataque</option>
+            <option value="name">Nome</option>
+            <option value="group">Grupo</option>
+            <option value="pop-desc">População</option>
+          </select>
+        </label>
       </div>
       <div id="picker-filters" hidden></div>
     </header>
@@ -103,6 +115,6 @@
       </div>
     </div>
   </div>
-  <script src="js/fusion.js?v=4"></script>
+  <script src="js/fusion.js?v=6"></script>
 </body>
 </html>

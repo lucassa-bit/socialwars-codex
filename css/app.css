@@ -639,6 +639,31 @@ body.fusion-page main {
   min-width: min(170px, 100%);
 }
 
+.thumb-hidden { display: none; }
+
+#results .thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+#results .card {
+  flex-basis: 280px;
+  width: 280px;
+}
+
+#results .thumb {
+  height: 168px;
+}
+
+#results .thumb-hidden {
+  display: flex;
+  background: #0c1008;
+}
+
+#results .thumb-hidden img {
+  filter: brightness(0);
+}
+
 .card.closest { border-color: var(--accent); }
 
 .card.closest::after {
@@ -739,7 +764,7 @@ body.fusion-page main {
   align-content: flex-start;
 }
 
-.fusion-results .card .order {
+.card .order {
   color: var(--accent);
   font-size: 11px;
 }

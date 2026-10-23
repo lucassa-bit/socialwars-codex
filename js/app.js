@@ -85,6 +85,7 @@ function renderStats(unit) {
     <div class="stat-block">
       <h3>Ficha</h3>
       <div class="stat-rows">
+        <div class="stat-row"><span>Order</span><b>${fusionOrder(unit)}</b></div>
         ${details}
         <div class="stat-row"><span>Melhor contra</span><b>${escapeHtml(versus)}</b></div>
       </div>
@@ -97,6 +98,12 @@ function renderStats(unit) {
 
 const GAME = document.body.dataset.game || "wars";
 const DATA_URL = GAME === "empires" ? "data/empires/units.json" : "data/units.json";
+const ORDER_CAP = 240;
+
+function fusionOrder(unit) {
+  const raw = Math.floor(Number(unit.life) / 20);
+  return GAME === "empires" ? Math.max(0, raw) : Math.min(raw, ORDER_CAP);
+}
 
 const search = document.getElementById("search");
 const grid = document.getElementById("grid");
@@ -109,6 +116,7 @@ const idEl = document.getElementById("viewer-id");
 const subtitle = document.getElementById("subtitle");
 const filtersEl = document.getElementById("filters");
 const filterToggle = document.getElementById("filter-toggle");
+const sortEl = document.getElementById("sort");
 
 /** @type {Map<number, object>} */
 const unitsById = new Map();
@@ -118,6 +126,7 @@ const selectedGroups = new Set();
 const selectedTraits = new Set();
 let animTimer = 0;
 let openUnitId = null;
+let sortKey = "order-desc";
 
 if (location.protocol === "file:") {
   document.getElementById("file-warn").style.display = "block";
@@ -126,6 +135,39 @@ if (location.protocol === "file:") {
 function parseHash() {
   const match = location.hash.match(/^#\/unit\/(\d+)/);
   return match ? Number(match[1]) : null;
+}
+
+function compareUnits(left, right) {
+  const orderLeft = fusionOrder(left);
+  const orderRight = fusionOrder(right);
+  const name = left.name.localeCompare(right.name, "pt");
+  switch (sortKey) {
+    case "order-asc":
+      return orderLeft - orderRight || name;
+    case "life-desc":
+      return (Number(right.life) || 0) - (Number(left.life) || 0) || name;
+    case "attack-desc":
+      return (Number(right.attack) || 0) - (Number(left.attack) || 0) || name;
+    case "name":
+      return name;
+    case "group":
+      return (left.group_label || "").localeCompare(right.group_label || "", "pt") || name;
+    case "pop-desc":
+      return (Number(right.population) || 0) - (Number(left.population) || 0) || name;
+    default:
+      return orderRight - orderLeft || name;
+  }
+}
+
+function applySort() {
+  const cards = [...grid.querySelectorAll(".card")];
+  cards.sort((leftCard, rightCard) => {
+    const left = unitsById.get(Number(leftCard.dataset.id));
+    const right = unitsById.get(Number(rightCard.dataset.id));
+    if (!left || !right) return 0;
+    return compareUnits(left, right);
+  });
+  cards.forEach((card) => grid.appendChild(card));
 }
 
 function applyFilters() {
@@ -225,7 +267,7 @@ function openViewer(unit, updateHash = true) {
 
   const frames = (unit.frames && unit.frames.length ? unit.frames : (unit.image ? [unit.image] : []));
   titleEl.textContent = unit.name;
-  idEl.textContent = `${unit.group_label || "Outros"} · ID ${unit.id}`;
+  idEl.textContent = `${unit.group_label || "Outros"} · ID ${unit.id} · order ${fusionOrder(unit)}`;
   player.innerHTML = "";
   overlay.classList.add("open");
 
@@ -270,13 +312,15 @@ function renderGrid(units) {
     card.dataset.group = unit.group || "";
     card.dataset.traits = (unit.traits || []).join(",");
     const src = unit.thumb || unit.image;
+    const order = fusionOrder(unit);
     const thumb = src
       ? `<img src="${src}" alt="${unit.name}" loading="lazy">`
       : '<div class="no-img">sem imagem</div>';
     card.innerHTML = `
-      <div class="thumb">${thumb}</div>
+      <div class="thumb">${thumb}<span class="order-badge">${order}</span></div>
       <div class="meta">
         <strong>${unit.name}</strong>
+        <span class="order">order ${order} · vida ${unit.life}</span>
         <span class="id">ID ${unit.id}</span>
         <span class="group">${unit.group_label || "Outros"}</span>
       </div>`;
@@ -284,6 +328,7 @@ function renderGrid(units) {
     fragment.appendChild(card);
   });
   grid.replaceChildren(fragment);
+  applySort();
   subtitle.textContent = `${units.length} unidades — vista de frente · clique para ficha e animação`;
 }
 
@@ -319,6 +364,10 @@ async function main() {
 }
 
 search.addEventListener("input", applyFilters);
+sortEl.addEventListener("change", () => {
+  sortKey = sortEl.value;
+  applySort();
+});
 if (filterToggle && filtersEl) {
   filterToggle.addEventListener("click", () => {
     const open = filtersEl.hasAttribute("hidden");
